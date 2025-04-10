@@ -1,0 +1,662 @@
+/* HomePage.css - Modern, consistent UI design */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #3563E9;
+  --primary-dark: #2851C2;
+  --primary-light: #EEF3FF;
+  --secondary: #1A1A1A;
+  --text-primary: #1A1A1A;
+  --text-secondary: #4B5563;
+  --text-light: #6B7280;
+  --background: #F9FAFB;
+  --white: #FFFFFF;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --transition: all 0.3s ease;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Poppins', sans-serif;
+  
+  /* Extended color palette */
+  --color-blue: #4361EE;
+  --color-purple: #3A0CA3;
+  --color-cyan: #4CC9F0;
+  --color-pink: #F72585;
+  --color-red: #e63946;
+  --color-orange: #f77f00;
+  --color-green: #38b000;
+  --color-teal: #2a9d8f;
+}
+
+.home-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background-color: var(--background);
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: var(--white);
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--spacing-xl);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+
+/* Add subtle animated gradient background */
+.hero-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.3), rgba(247, 37, 133, 0.2));
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl) 0;
+}
+
+.hero-left {
+  flex: 1;
+  text-align: left;
+  max-width: 600px;
+}
+
+.hero-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.hero-right svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.hero-section h1 {
+  font-family: var(--font-heading);
+  font-size: 4.5rem;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(90deg, #fff, #e6f0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-section h2 {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+.hero-section p {
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 300;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* Search Form */
+.search-form {
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-container {
+  display: flex;
+  width: 100%;
+  border-radius: 50px;
+  background: var(--white);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-container:focus-within {
+  box-shadow: var(--hover-shadow);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-input {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-light);
+  font-family: var(--font-body);
+  font-weight: 300;
+}
+
+.search-button {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 0 2rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.search-button:hover {
+  background: var(--primary-dark);
+}
+
+/* Section Styles */
+.features-section,
+.categories-section,
+.benefits-section {
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-xl);
+  position: relative;
+}
+
+.features-section h3, 
+.categories-section h3, 
+.benefits-section h3 {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-primary);
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.features-section h3::after, 
+.categories-section h3::after, 
+.benefits-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+/* Add decorations to sections */
+.features-section::before,
+.categories-section::before,
+.benefits-section::before {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-cyan) 100%);
+  opacity: 0.05;
+  z-index: -1;
+}
+
+.features-section::before {
+  top: -50px;
+  left: -50px;
+}
+
+.categories-section::before {
+  bottom: -50px;
+  right: -50px;
+}
+
+.benefits-section::before {
+  top: 30%;
+  left: -50px;
+}
+
+/* Cards Styling */
+.feature-cards,
+.category-cards {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  padding: var(--spacing-md) var(--spacing-xs);
+  margin: var(--spacing-md) -8px;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.feature-cards::-webkit-scrollbar,
+.category-cards::-webkit-scrollbar {
+  display: none;
+}
+
+/* Feature Cards */
+.feature-card {
+  flex: 0 0 320px;
+  min-width: 320px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow: var(--card-shadow);
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.card-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background-color: var(--primary-light);
+  margin-bottom: var(--spacing-sm);
+}
+
+.card-icon i {
+  font-size: 30px;
+  color: var(--primary);
+}
+
+.feature-card h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.feature-card p {
+  font-weight: 300;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-md);
+  flex-grow: 1;
+}
+
+.card-button {
+  background: var(--primary);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  align-self: flex-start;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.card-button:hover::before {
+  left: 100%;
+}
+
+.card-button.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.card-button.highlight-btn {
+  background: var(--color-blue);
+}
+
+.soon-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--text-secondary);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feature-card.coming-soon {
+  opacity: 0.75;
+}
+
+.feature-card.highlight {
+  border-width: 2px;
+}
+
+/* Category Cards */
+.category-cards {
+  padding: var(--spacing-md) var(--spacing-xs);
+}
+
+.category-card {
+  flex: 0 0 180px;
+  min-width: 180px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.category-card i {
+  font-size: 32px;
+  color: var(--primary);
+  transition: var(--transition);
+  margin-bottom: var(--spacing-xs);
+}
+
+.category-card span {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+/* Benefits Section */
+.benefits-section {
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: 0;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.benefit-item {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  transition: var(--transition);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.benefit-item i {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+  transition: var(--transition);
+}
+
+.benefit-item h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.benefit-item p {
+  font-weight: 300;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Scroll Container Styling */
+.scroll-container {
+  position: relative;
+  padding: 0 var(--spacing-md);
+}
+
+.scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--white);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+  color: var(--text-primary);
+}
+
+.scroll-button.left {
+  left: 0;
+}
+
+.scroll-button.right {
+  right: 0;
+}
+
+.scroll-button:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.scroll-button i {
+  font-size: 1.2rem;
+}
+
+.scroll-indicator {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+  gap: 8px;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.indicator-dot.active {
+  width: 12px;
+  height: 12px;
+  background-color: var(--primary);
+}
+
+.indicator-dot:hover {
+  background-color: var(--primary-light);
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .hero-left {
+    max-width: 100%;
+    padding: 0 var(--spacing-md);
+    text-align: center;
+  }
+  
+  .hero-right {
+    max-width: 80%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: auto;
+    padding: var(--spacing-xl) var(--spacing-sm);
+  }
+  
+  .hero-section h1 {
+    font-size: 3rem;
+  }
+  
+  .hero-section h2 {
+    font-size: 1.75rem;
+  }
+  
+  .features-section h3, 
+  .categories-section h3, 
+  .benefits-section h3 {
+    font-size: 2rem;
+  }
+  
+  .features-section, 
+  .categories-section, 
+  .benefits-section {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+  
+  .benefit-item {
+    padding: var(--spacing-md);
+  }
+  
+  .hero-right {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hero-section p {
+    font-size: 1rem;
+  }
+  
+  .search-input {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .search-button {
+    padding: 0 1.25rem;
+  }
+  
+  .feature-card {
+    min-width: 280px;
+    padding: var(--spacing-md);
+  }
+  
+  .feature-card h4 {
+    font-size: 1.25rem;
+  }
+  
+  .category-card {
+    min-width: 160px;
+  }
+  
+  .hero-right {
+    display: none;
+  }
+} 

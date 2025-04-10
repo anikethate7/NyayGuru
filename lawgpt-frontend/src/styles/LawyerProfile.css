@@ -1,0 +1,321 @@
+/* LawyerProfile.css - Basic styling */
+.lawyer-profile-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.profile-header {
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: #4CC9F0;
+  border: 1px solid #4CC9F0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background-color: #4CC9F0;
+  color: white;
+}
+
+.back-button i {
+  margin-right: 0.5rem;
+}
+
+.profile-hero {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.profile-avatar-container {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.profile-avatar .status-indicator {
+  width: 25px;
+  height: 25px;
+  border: 3px solid white;
+}
+
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  background-color: #f8f9fa;
+  color: #28a745;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.verification-badge i {
+  margin-right: 0.3rem;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2.2rem;
+  color: #333;
+}
+
+.profile-info .specialization {
+  font-size: 1.2rem;
+  color: #4361EE;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item i {
+  font-size: 1.5rem;
+  color: #4CC9F0;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.profile-badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: white;
+}
+
+.profile-badge i {
+  margin-right: 0.4rem;
+}
+
+.profile-actions {
+  margin-top: 1.5rem;
+}
+
+.chat-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  background-color: #4CC9F0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.chat-button:hover {
+  background-color: #3db8dd;
+}
+
+.chat-button i {
+  margin-right: 0.5rem;
+}
+
+.chat-button.offline-button {
+  background-color: #e9ecef;
+  color: #666;
+}
+
+.profile-content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-button i {
+  margin-right: 0.5rem;
+}
+
+.tab-button:hover {
+  color: #4CC9F0;
+}
+
+.tab-button.active {
+  color: #4CC9F0;
+  border-bottom: 3px solid #4CC9F0;
+}
+
+.profile-tab-content {
+  padding: 2rem;
+}
+
+/* Tab specific styles */
+.about-tab h3,
+.experience-tab h3,
+.education-tab h3,
+.reviews-tab h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.lawyer-bio {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+}
+
+.info-section h4 {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.7rem;
+}
+
+.info-section h4 i {
+  margin-right: 0.5rem;
+  color: #4CC9F0;
+}
+
+.info-section p {
+  margin: 0;
+  color: #555;
+}
+
+.language-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.language-tag {
+  padding: 0.3rem 0.8rem;
+  background-color: #f8f9fa;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .profile-hero {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  
+  .profile-avatar-container {
+    align-self: center;
+  }
+  
+  .profile-info h1 {
+    text-align: center;
+  }
+  
+  .profile-info .specialization {
+    text-align: center;
+  }
+  
+  .profile-stats {
+    justify-content: center;
+  }
+  
+  .profile-badge-container {
+    justify-content: center;
+  }
+  
+  .profile-actions {
+    text-align: center;
+  }
+  
+  .profile-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-button {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.9rem;
+  }
+} 
