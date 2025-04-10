@@ -18,6 +18,7 @@ const LawyersPage = () => {
   const [sortBy, setSortBy] = useState('rating');
   const [minExperience, setMinExperience] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('grid'); // grid or list view
 
   // Specializations array
   const specializations = [
@@ -81,17 +82,24 @@ const LawyersPage = () => {
   };
 
   // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } }
   };
 
   // Render loading state
@@ -99,7 +107,7 @@ const LawyersPage = () => {
     return (
       <div className="lawyers-loading">
         <div className="spinner"></div>
-        <p>Loading lawyers...</p>
+        <p>Looking for legal experts...</p>
       </div>
     );
   }
@@ -120,165 +128,313 @@ const LawyersPage = () => {
 
   return (
     <div className="lawyers-page">
-      <div className="lawyers-header">
-        <h1>Find a Lawyer</h1>
-        <p>Connect with verified legal professionals for consultation</p>
-        <button 
-          onClick={() => navigate('/lawyer-registration')} 
-          className="register-lawyer-btn"
+      {/* Hero Section */}
+      <div className="lawyers-hero-wrapper">
+        <motion.div 
+          className="lawyers-hero-section"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <i className="bi bi-person-plus-fill"></i> Register as a Lawyer
-        </button>
-      </div>
-      
-      <div className="lawyers-filters">
-        <div className="filter-group search">
-          <input
-            type="text"
-            placeholder="Search by name or specialization..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-        </div>
-        
-        <div className="filter-group">
-          <label>Specialization</label>
-          <select 
-            value={specialization} 
-            onChange={(e) => setSpecialization(e.target.value)}
-          >
-            <option value="">All Specializations</option>
-            {specializations.map(spec => (
-              <option key={spec} value={spec}>{spec}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="filter-group">
-          <label>Sort By</label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="rating">Highest Rating</option>
-            <option value="experience">Most Experienced</option>
-            <option value="name">Name (A-Z)</option>
-          </select>
-        </div>
-        
-        <div className="filter-group">
-          <label>Min. Experience</label>
-          <select 
-            value={minExperience} 
-            onChange={(e) => setMinExperience(Number(e.target.value))}
-          >
-            <option value="0">Any Experience</option>
-            <option value="2">2+ Years</option>
-            <option value="5">5+ Years</option>
-            <option value="10">10+ Years</option>
-            <option value="15">15+ Years</option>
-          </select>
-        </div>
-      </div>
-      
-      <div className="lawyers-results-info">
-        <p>Showing <strong>{filteredLawyers.length}</strong> lawyers</p>
-      </div>
-      
-      <motion.div 
-        className="lawyers-list"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {filteredLawyers.length === 0 ? (
-          <div className="no-lawyers-found">
-            <i className="bi bi-search"></i>
-            <h3>No lawyers found</h3>
-            <p>Try adjusting your filters or search query</p>
-          </div>
-        ) : (
-          filteredLawyers.map(lawyer => (
+          <div className="lawyers-hero-content">
             <motion.div 
-              key={lawyer.id} 
-              className="lawyer-card"
-              variants={itemVariants}
-              whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+              className="lawyers-hero-text"
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
             >
-              <div className="lawyer-card-header">
-                <div className="lawyer-avatar">
-                  {lawyer.profilePicture ? (
-                    <img src={lawyer.profilePicture} alt={lawyer.name} />
-                  ) : (
-                    <div className="avatar-placeholder">
-                      <i className="bi bi-person-fill"></i>
-                    </div>
-                  )}
-                  <div className={`status-indicator ${lawyer.online ? 'online' : 'offline'}`}></div>
-                </div>
-                <div className="lawyer-info">
-                  <h3>{lawyer.name}</h3>
-                  <div className="lawyer-specialization">{lawyer.specialization}</div>
-                  <div className="lawyer-rating">
-                    <div className="stars">
-                      {[...Array(5)].map((_, i) => (
-                        <i 
-                          key={i} 
-                          className={`bi ${i < Math.floor(lawyer.rating) ? 'bi-star-fill' : i < lawyer.rating ? 'bi-star-half' : 'bi-star'}`}
-                        ></i>
-                      ))}
-                    </div>
-                    <span>{lawyer.rating.toFixed(1)}</span>
-                    <span className="review-count">({lawyer.reviewCount} reviews)</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="lawyer-details">
-                <div className="detail-item">
-                  <i className="bi bi-briefcase-fill"></i>
-                  <span>{lawyer.experience} years experience</span>
-                </div>
-                <div className="detail-item">
-                  <i className="bi bi-geo-alt-fill"></i>
-                  <span>{lawyer.location}</span>
-                </div>
-                <div className="detail-item">
-                  <i className="bi bi-translate"></i>
-                  <span>{lawyer.languages.join(', ')}</span>
-                </div>
-              </div>
-              
-              <p className="lawyer-bio">{lawyer.bio?.substring(0, 120)}...</p>
-              
-              <div className="lawyer-card-footer">
-                <button 
-                  onClick={() => handleViewProfile(lawyer.id)} 
-                  className="view-profile-btn"
+              <h1>Expert <span>Legal</span> Advice</h1>
+              <p>Connect with verified legal professionals for personalized consultation</p>
+              <div className="hero-cta-buttons">
+                <motion.button 
+                  className="primary-cta-btn"
+                  onClick={() => document.querySelector('.lawyers-filters').scrollIntoView({ behavior: 'smooth' })}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <i className="bi bi-person-vcard"></i> View Profile
-                </button>
-                <button 
-                  onClick={() => handleStartChat(lawyer.id)} 
-                  className={`chat-button ${!lawyer.online ? 'offline-button' : ''}`}
-                  disabled={!lawyer.online && !lawyer.allowOfflineMessages}
+                  <i className="bi bi-search"></i> Find Lawyers
+                </motion.button>
+                <motion.button 
+                  onClick={() => navigate('/lawyer-registration')} 
+                  className="secondary-cta-btn"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {lawyer.online ? (
-                    <>
-                      <i className="bi bi-chat-text-fill"></i> Chat Now
-                    </>
-                  ) : lawyer.allowOfflineMessages ? (
-                    <>
-                      <i className="bi bi-envelope-fill"></i> Leave Message
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-clock-fill"></i> Offline
-                    </>
-                  )}
-                </button>
+                  <i className="bi bi-person-plus-fill"></i> Register as a Lawyer
+                </motion.button>
               </div>
             </motion.div>
-          ))
-        )}
+          </div>
+        </motion.div>
+      </div>
+      
+      <div className="lawyers-main-content">
+        <motion.div 
+          className="lawyers-content-container"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          {/* Search and Filter Section */}
+          <motion.div className="filters-container" variants={fadeInUp}>
+            <div className="section-header">
+              <h2>Find Legal Experts</h2>
+              <p>Search and filter to find the right legal professional for your needs</p>
+            </div>
+            
+            <div className="lawyers-filters">
+              <div className="search-bar">
+                <i className="bi bi-search search-icon"></i>
+                <input
+                  type="text"
+                  placeholder="Search by name, expertise or location..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button 
+                    className="clear-search" 
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <i className="bi bi-x-circle-fill"></i>
+                  </button>
+                )}
+              </div>
+              
+              <div className="filters-row">
+                <div className="filter-group">
+                  <label>
+                    <i className="bi bi-briefcase-fill"></i> Specialization
+                  </label>
+                  <select 
+                    value={specialization} 
+                    onChange={(e) => setSpecialization(e.target.value)}
+                  >
+                    <option value="">All Specializations</option>
+                    {specializations.map(spec => (
+                      <option key={spec} value={spec}>{spec}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="filter-group">
+                  <label>
+                    <i className="bi bi-sort-down"></i> Sort By
+                  </label>
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="rating">Highest Rating</option>
+                    <option value="experience">Most Experienced</option>
+                    <option value="name">Name (A-Z)</option>
+                  </select>
+                </div>
+                
+                <div className="filter-group">
+                  <label>
+                    <i className="bi bi-calendar-check"></i> Experience
+                  </label>
+                  <select 
+                    value={minExperience} 
+                    onChange={(e) => setMinExperience(Number(e.target.value))}
+                  >
+                    <option value="0">Any Experience</option>
+                    <option value="2">2+ Years</option>
+                    <option value="5">5+ Years</option>
+                    <option value="10">10+ Years</option>
+                    <option value="15">15+ Years</option>
+                  </select>
+                </div>
+                
+                <div className="view-toggle">
+                  <button 
+                    className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                    onClick={() => setViewMode('grid')}
+                    aria-label="Grid view"
+                  >
+                    <i className="bi bi-grid-3x3-gap-fill"></i>
+                  </button>
+                  <button 
+                    className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                    onClick={() => setViewMode('list')}
+                    aria-label="List view"
+                  >
+                    <i className="bi bi-list-ul"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+          
+          {/* Results Counter */}
+          <motion.div className="lawyers-results-info" variants={fadeInUp}>
+            <div className="results-count">
+              <i className="bi bi-people-fill"></i>
+              <p><strong>{filteredLawyers.length}</strong> lawyers available</p>
+            </div>
+            
+            {(specialization || minExperience > 0 || searchQuery) && (
+              <button 
+                className="clear-filters-btn"
+                onClick={() => {
+                  setSpecialization('');
+                  setSortBy('rating');
+                  setMinExperience(0);
+                  setSearchQuery('');
+                }}
+              >
+                <i className="bi bi-x-circle"></i> Clear Filters
+              </button>
+            )}
+          </motion.div>
+          
+          {/* Lawyers List/Grid */}
+          <motion.div 
+            className={`lawyers-${viewMode}`}
+            variants={staggerContainer}
+          >
+            {filteredLawyers.length === 0 ? (
+              <motion.div 
+                className="no-lawyers-found"
+                variants={fadeInUp}
+              >
+                <div className="empty-state-icon">
+                  <i className="bi bi-search"></i>
+                </div>
+                <h3>No lawyers found</h3>
+                <p>Try adjusting your filters or search criteria</p>
+                <button 
+                  className="reset-search-btn"
+                  onClick={() => {
+                    setSpecialization('');
+                    setSortBy('rating');
+                    setMinExperience(0);
+                    setSearchQuery('');
+                  }}
+                >
+                  Reset Search
+                </button>
+              </motion.div>
+            ) : (
+              filteredLawyers.map(lawyer => (
+                <motion.div 
+                  key={lawyer.id} 
+                  className="lawyer-card"
+                  variants={scaleIn}
+                  onClick={() => handleViewProfile(lawyer.id)}
+                >
+                  {lawyer.verified && (
+                    <div className="verification-badge" title="Verified Professional">
+                      <i className="bi bi-patch-check-fill"></i>
+                    </div>
+                  )}
+                  
+                  <div className="lawyer-card-header">
+                    <div className="lawyer-avatar">
+                      {lawyer.profilePicture ? (
+                        <img src={lawyer.profilePicture} alt={lawyer.name} />
+                      ) : (
+                        <div className="avatar-placeholder">
+                          <i className="bi bi-person-fill"></i>
+                        </div>
+                      )}
+                      <div className={`status-indicator ${lawyer.online ? 'online' : 'offline'}`}></div>
+                    </div>
+                    <div className="lawyer-info">
+                      <h3>{lawyer.name}</h3>
+                      <div className="specialization-badge">
+                        <i className="bi bi-briefcase-fill"></i>
+                        <span>{lawyer.specialization}</span>
+                      </div>
+                      <div className="lawyer-rating">
+                        <div className="stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i 
+                              key={i} 
+                              className={`bi ${i < Math.floor(lawyer.rating) ? 'bi-star-fill' : i < lawyer.rating ? 'bi-star-half' : 'bi-star'}`}
+                            ></i>
+                          ))}
+                        </div>
+                        <span>{lawyer.rating.toFixed(1)}</span>
+                        <span className="review-count">({lawyer.reviewCount})</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="lawyer-details">
+                    <div className="detail-badge">
+                      <i className="bi bi-briefcase"></i>
+                      <span>{lawyer.experience} years</span>
+                    </div>
+                    <div className="detail-badge">
+                      <i className="bi bi-geo-alt"></i>
+                      <span>{lawyer.location}</span>
+                    </div>
+                    <div className="detail-badge">
+                      <i className="bi bi-translate"></i>
+                      <span>{lawyer.languages.join(', ')}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="lawyer-bio-section">
+                    <p className="lawyer-bio">{lawyer.bio?.substring(0, 140)}...</p>
+                  </div>
+                  
+                  <div className="lawyer-card-footer">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewProfile(lawyer.id);
+                      }} 
+                      className="view-profile-btn"
+                    >
+                      <i className="bi bi-person-lines-fill"></i> View Profile
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartChat(lawyer.id);
+                      }} 
+                      className={`chat-button ${!lawyer.online ? 'offline-button' : ''}`}
+                      disabled={!lawyer.online && !lawyer.allowOfflineMessages}
+                    >
+                      {lawyer.online ? (
+                        <>
+                          <i className="bi bi-chat-text-fill"></i> Chat Now
+                        </>
+                      ) : lawyer.allowOfflineMessages ? (
+                        <>
+                          <i className="bi bi-envelope-fill"></i> Leave Message
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-clock-fill"></i> Offline
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        </motion.div>
+      </div>
+      
+      {/* CTA Section */}
+      <motion.div 
+        className="lawyers-cta-section"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <div className="cta-content">
+          <h2>Are You a Legal Professional?</h2>
+          <p>Join our platform to connect with clients seeking legal advice and grow your practice</p>
+          <button 
+            className="register-lawyer-cta"
+            onClick={() => navigate('/lawyer-registration')}
+          >
+            <i className="bi bi-person-plus-fill"></i> Register as a Lawyer
+          </button>
+        </div>
       </motion.div>
     </div>
   );
@@ -288,16 +444,18 @@ const LawyersPage = () => {
 const mockLawyers = [
   {
     id: 1,
-    name: 'Adv. Rajesh Sharma',
+    name: 'Adv. Rahul Sharma',
     specialization: 'Criminal Law',
     experience: 12,
     rating: 4.8,
-    reviewCount: 124,
-    online: true,
-    location: 'Mumbai, Maharashtra',
+    reviewCount: 52,
     languages: ['English', 'Hindi', 'Marathi'],
-    profilePicture: 'https://randomuser.me/api/portraits/men/42.jpg',
-    bio: 'Specializing in criminal defense with over 12 years of experience. I have successfully defended clients in high-profile cases including white-collar crimes, assault charges, and fraud allegations.'
+    location: 'Mumbai, Maharashtra',
+    online: true,
+    verified: true,
+    bio: 'Experienced criminal lawyer with expertise in handling serious criminal cases, bail applications, and appeals. Former public prosecutor with excellent track record.',
+    profilePicture: null,
+    allowOfflineMessages: true
   },
   {
     id: 2,
@@ -305,64 +463,74 @@ const mockLawyers = [
     specialization: 'Family Law',
     experience: 8,
     rating: 4.9,
-    reviewCount: 87,
-    online: true,
-    location: 'Delhi, NCR',
-    languages: ['English', 'Hindi', 'Punjabi'],
-    profilePicture: 'https://randomuser.me/api/portraits/women/26.jpg',
-    bio: 'I am a family law specialist focused on divorce, child custody, and domestic violence cases. My approach is compassionate yet effective, ensuring the best outcome for my clients.'
+    reviewCount: 47,
+    languages: ['English', 'Gujarati', 'Hindi'],
+    location: 'Ahmedabad, Gujarat',
+    online: false,
+    verified: true,
+    bio: 'Dedicated family lawyer specializing in divorce, child custody, maintenance, and domestic violence cases with compassionate approach to sensitive family matters.',
+    profilePicture: null,
+    allowOfflineMessages: true
   },
   {
     id: 3,
-    name: 'Adv. Vikram Malhotra',
+    name: 'Adv. Vikram Singh',
     specialization: 'Corporate Law',
     experience: 15,
     rating: 4.7,
-    reviewCount: 156,
-    online: false,
-    location: 'Bangalore, Karnataka',
-    languages: ['English', 'Hindi', 'Kannada'],
-    profilePicture: 'https://randomuser.me/api/portraits/men/21.jpg',
-    bio: 'Former legal advisor to multiple Fortune 500 companies. I specialize in corporate structuring, mergers & acquisitions, and compliance issues with expertise in international business law.'
+    reviewCount: 38,
+    languages: ['English', 'Hindi', 'Punjabi'],
+    location: 'Delhi, NCR',
+    online: true,
+    verified: true,
+    bio: 'Corporate lawyer with extensive experience in mergers & acquisitions, company formation, corporate governance, and commercial contracts for businesses of all sizes.',
+    profilePicture: null,
+    allowOfflineMessages: true
   },
   {
     id: 4,
-    name: 'Adv. Sneha Gupta',
+    name: 'Adv. Ananya Krishnan',
     specialization: 'Property Law',
-    experience: 6,
+    experience: 7,
     rating: 4.5,
-    reviewCount: 62,
-    online: true,
-    location: 'Pune, Maharashtra',
-    languages: ['English', 'Hindi', 'Marathi'],
-    profilePicture: 'https://randomuser.me/api/portraits/women/65.jpg',
-    bio: 'Property law expert specializing in real estate transactions, tenant disputes, and property documentation. I provide end-to-end legal solutions for all property-related matters.'
+    reviewCount: 29,
+    languages: ['English', 'Tamil', 'Malayalam'],
+    location: 'Chennai, Tamil Nadu',
+    online: false,
+    verified: true,
+    bio: 'Property law specialist handling property disputes, registration, land acquisition, and tenant-landlord issues. Previously worked with Tamil Nadu Housing Board.',
+    profilePicture: null,
+    allowOfflineMessages: false
   },
   {
     id: 5,
-    name: 'Adv. Sunil Reddy',
-    specialization: 'Cyber Law',
-    experience: 9,
+    name: 'Adv. Mohammad Farhan',
+    specialization: 'Civil Law',
+    experience: 10,
     rating: 4.6,
-    reviewCount: 93,
-    online: false,
-    location: 'Hyderabad, Telangana',
-    languages: ['English', 'Hindi', 'Telugu'],
-    profilePicture: 'https://randomuser.me/api/portraits/men/32.jpg',
-    bio: 'Cyber law specialist with expertise in data privacy, online fraud, and digital rights. I have worked with tech companies and individuals facing cybercrime issues.'
+    reviewCount: 41,
+    languages: ['English', 'Hindi', 'Urdu'],
+    location: 'Lucknow, Uttar Pradesh',
+    online: true,
+    verified: true,
+    bio: 'Civil litigation expert specializing in consumer disputes, recovery suits, civil rights, and injunction matters with strong negotiation and courtroom skills.',
+    profilePicture: null,
+    allowOfflineMessages: true
   },
   {
     id: 6,
-    name: 'Adv. Meera Krishnan',
-    specialization: 'Labor Law',
-    experience: 11,
-    rating: 4.7,
-    reviewCount: 108,
+    name: 'Adv. Neha Joshi',
+    specialization: 'Cyber Law',
+    experience: 5,
+    rating: 4.4,
+    reviewCount: 18,
+    languages: ['English', 'Hindi', 'Marathi'],
+    location: 'Pune, Maharashtra',
     online: true,
-    location: 'Chennai, Tamil Nadu',
-    languages: ['English', 'Tamil', 'Malayalam'],
-    profilePicture: 'https://randomuser.me/api/portraits/women/33.jpg',
-    bio: 'Experienced in handling workplace disputes, employment contracts, and labor compliance. I have successfully represented both employees and employers in various labor cases.'
+    verified: true,
+    bio: 'Cyber law specialist handling cases of online fraud, privacy violations, data protection, digital rights, and technology contracts. Certified in Digital Forensics.',
+    profilePicture: null,
+    allowOfflineMessages: true
   }
 ];
 

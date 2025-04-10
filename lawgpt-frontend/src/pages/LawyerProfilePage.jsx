@@ -1,11 +1,40 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { formatDistanceToNow } from 'date-fns';
 import '../styles/LawyerProfile.css';
 
 // API base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+
+// Animation variants for smooth transitions
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { duration: 0.6 }
+  }
+};
 
 const LawyerProfilePage = () => {
   const { id } = useParams();
@@ -14,94 +43,146 @@ const LawyerProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
+  
+  // Mock reviews for development
+  const mockReviews = [
+    {
+      id: 1,
+      name: "Amit Sharma",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      rating: 5,
+      date: new Date(2023, 6, 15),
+      comment: "Very knowledgeable lawyer who helped me with my property dispute. Explained everything in simple terms and got results quickly."
+    },
+    {
+      id: 2,
+      name: "Priya Patel",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      rating: 4,
+      date: new Date(2023, 5, 22),
+      comment: "Good experience overall. Professional approach and always responsive to queries. The case took longer than expected but ended with a positive outcome."
+    },
+    {
+      id: 3,
+      name: "Rajesh Kumar",
+      avatar: "https://randomuser.me/api/portraits/men/62.jpg",
+      rating: 5,
+      date: new Date(2023, 4, 10),
+      comment: "Excellent service and expertise. Handled my divorce case with sensitivity and professionalism. Would definitely recommend."
+    }
+  ];
 
   useEffect(() => {
-    // Fetch lawyer details from API
     const fetchLawyerDetails = async () => {
-      setLoading(true);
       try {
-        // Make API request
+        setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/lawyers/${id}`);
-        
-        if (response.status === 200) {
-          setLawyer(response.data);
-        } else {
-          throw new Error('Failed to fetch lawyer details');
-        }
-        setLoading(false);
+        setLawyer(response.data);
+        setError(null);
       } catch (err) {
-        console.error('Error fetching lawyer details:', err);
-        setError('Failed to load lawyer details. Please try again later.');
-        setLoading(false);
+        console.error("Error fetching lawyer details:", err);
+        setError("Failed to load lawyer details. Please try again later.");
         
-        // Fallback to mock data in development or when API is unavailable
-        if (import.meta.env.DEV) {
-          console.log('Falling back to mock data in development mode');
-          setTimeout(() => {
-            const foundLawyer = mockLawyers.find(l => l.id === parseInt(id));
-            if (foundLawyer) {
-              setLawyer(foundLawyer);
-              setError(null);
-            } else {
-              setError('Lawyer not found');
-            }
-            setLoading(false);
-          }, 800);
+        // For development: use mock data if API fails
+        if (process.env.NODE_ENV === 'development') {
+          setLawyer({
+            id: id,
+            name: "Adv. Vikram Malhotra",
+            avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+            specialization: "Criminal Law",
+            experience: 12,
+            rating: 4.8,
+            reviewCount: 124,
+            cases: 280,
+            successRate: 92,
+            online: true,
+            phone: "+91 98765 43210",
+            email: "vikram.malhotra@legaladvisor.com",
+            location: "Mumbai, Maharashtra",
+            languages: ["English", "Hindi", "Marathi"],
+            feesRange: "₹2,000 - ₹5,000",
+            bio: "Senior advocate with 12+ years of experience in criminal law. I've successfully handled over 280 cases ranging from petty offenses to serious crimes. My approach focuses on thorough investigation, strong courtroom representation, and client-centered service.",
+            education: [
+              { degree: "LLB", institution: "National Law School, Bangalore", year: "2011" },
+              { degree: "LLM in Criminal Law", institution: "Delhi University", year: "2013" }
+            ],
+            experience_details: [
+              { position: "Senior Associate", firm: "Sharma & Associates", period: "2013-2018", description: "Handled criminal cases including bail applications, trials, and appeals." },
+              { position: "Partner", firm: "Legal Defenders LLP", period: "2018-Present", description: "Lead a team of 5 associates focusing on criminal defense and constitutional matters." }
+            ],
+            achievements: [
+              "Successfully defended clients in 15 high-profile murder cases",
+              "Recognized by Bar Association for pro bono services (2019)",
+              "Published author in Indian Law Journal"
+            ]
+          });
+          setError(null);
         }
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchLawyerDetails();
   }, [id]);
 
-  const handleStartChat = () => {
-    navigate(`/chat/lawyer/${id}`);
+  const handleBackClick = () => {
+    navigate(-1);
   };
 
-  // Animation variants
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  const handleChatClick = () => {
+    navigate(`/chat/${id}`);
   };
 
-  // Render loading state
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
+    
+    return (
+      <div className="stars">
+        {[...Array(5)].map((_, index) => {
+          if (index < fullStars) {
+            return <i key={index} className="fas fa-star"></i>;
+          } else if (index === fullStars && hasHalfStar) {
+            return <i key={index} className="fas fa-star-half-alt"></i>;
+          } else {
+            return <i key={index} className="far fa-star"></i>;
+          }
+        })}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="lawyer-profile-loading">
+      <div className="profile-loading">
         <div className="spinner"></div>
         <p>Loading lawyer profile...</p>
       </div>
     );
   }
 
-  // Render error state
   if (error) {
     return (
-      <div className="lawyer-profile-error">
-        <i className="bi bi-exclamation-triangle-fill"></i>
-        <h3>Oops! Something went wrong</h3>
+      <div className="profile-error">
+        <i className="fas fa-exclamation-circle"></i>
+        <h3>Something went wrong</h3>
         <p>{error}</p>
-        <div className="error-buttons">
-          <button onClick={() => navigate('/lawyers')} className="back-button">
-            <i className="bi bi-arrow-left"></i> Back to Lawyers
-          </button>
-          <button onClick={() => window.location.reload()} className="retry-button">
-            <i className="bi bi-arrow-clockwise"></i> Retry
-          </button>
-        </div>
+        <button className="retry-button" onClick={() => window.location.reload()}>
+          <i className="fas fa-sync-alt"></i> Try Again
+        </button>
       </div>
     );
   }
 
-  // Render not found state
   if (!lawyer) {
     return (
-      <div className="lawyer-profile-not-found">
-        <i className="bi bi-person-x-fill"></i>
+      <div className="profile-error">
+        <i className="fas fa-user-slash"></i>
         <h3>Lawyer Not Found</h3>
-        <p>The lawyer you're looking for doesn't exist or has been removed.</p>
-        <button onClick={() => navigate('/lawyers')} className="back-button">
-          <i className="bi bi-arrow-left"></i> Back to Lawyers
+        <p>The lawyer profile you're looking for doesn't exist or has been removed.</p>
+        <button className="back-button" onClick={handleBackClick}>
+          <i className="fas fa-arrow-left"></i> Back to Lawyers
         </button>
       </div>
     );
@@ -114,386 +195,316 @@ const LawyerProfilePage = () => {
       animate="visible"
       variants={fadeIn}
     >
-      <div className="profile-header">
-        <button onClick={() => navigate('/lawyers')} className="back-button">
-          <i className="bi bi-arrow-left"></i> Back to Lawyers
-        </button>
-        
-        <div className="profile-hero">
-          <div className="profile-avatar-container">
-            <div className="profile-avatar">
-              {lawyer.profilePicture ? (
-                <img src={lawyer.profilePicture} alt={lawyer.name} />
+      <div className="profile-hero-section">
+        <div className="profile-hero-overlay"></div>
+        <div className="profile-container">
+          <motion.button 
+            className="back-button" 
+            onClick={handleBackClick}
+            variants={fadeInUp}
+          >
+            <i className="fas fa-arrow-left"></i> Back
+          </motion.button>
+          
+          <motion.div className="profile-hero" variants={fadeInUp}>
+            <div className="avatar-container">
+              {lawyer.avatar ? (
+                <img src={lawyer.avatar} alt={lawyer.name} />
               ) : (
                 <div className="avatar-placeholder">
-                  <i className="bi bi-person-fill"></i>
+                  {lawyer.name.charAt(0)}
                 </div>
               )}
-              <div className={`status-indicator ${lawyer.online ? 'online' : 'offline'}`}></div>
-            </div>
-            {lawyer.verified && (
+              {lawyer.online && (
+                <div className="status-badge online">
+                  <span>Online</span>
+                </div>
+              )}
               <div className="verification-badge">
-                <i className="bi bi-patch-check-fill"></i> Verified
-              </div>
-            )}
-          </div>
-          
-          <div className="profile-info">
-            <h1>{lawyer.name}</h1>
-            <h3 className="specialization">{lawyer.specialization}</h3>
-            
-            <div className="profile-stats">
-              <div className="stat-item">
-                <i className="bi bi-star-fill"></i>
-                <span className="stat-value">{lawyer.rating.toFixed(1)}</span>
-                <span className="stat-label">Rating</span>
-              </div>
-              <div className="stat-item">
-                <i className="bi bi-chat-text-fill"></i>
-                <span className="stat-value">{lawyer.reviewCount}</span>
-                <span className="stat-label">Reviews</span>
-              </div>
-              <div className="stat-item">
-                <i className="bi bi-briefcase-fill"></i>
-                <span className="stat-value">{lawyer.experience}</span>
-                <span className="stat-label">Years</span>
+                <i className="fas fa-check"></i> Verified
               </div>
             </div>
             
-            <div className="profile-badge-container">
-              {lawyer.badges && lawyer.badges.map((badge, index) => (
-                <span key={index} className="profile-badge" style={{ background: badge.color }}>
-                  <i className={`bi ${badge.icon}`}></i> {badge.name}
-                </span>
-              ))}
-            </div>
-            
-            <div className="profile-actions">
-              <button 
-                onClick={handleStartChat}
-                className={`chat-button ${!lawyer.online ? 'offline-button' : ''}`}
-                disabled={!lawyer.online && !lawyer.allowOfflineMessages}
+            <div className="profile-info">
+              <motion.h1 variants={fadeInUp}>{lawyer.name}</motion.h1>
+              <motion.div className="profile-specialization" variants={fadeInUp}>
+                <span>{lawyer.specialization}</span>
+              </motion.div>
+              
+              <motion.div className="profile-stats" variants={staggerContainer}>
+                <motion.div className="stat-item" variants={fadeInUp}>
+                  <div className="stat-value">{lawyer.experience}+</div>
+                  <div className="stat-label">Years</div>
+                </motion.div>
+                <motion.div className="stat-item" variants={fadeInUp}>
+                  <div className="stat-value">{lawyer.cases || '200'}+</div>
+                  <div className="stat-label">Cases</div>
+                </motion.div>
+                <motion.div className="stat-item" variants={fadeInUp}>
+                  <div className="stat-value">{lawyer.successRate || '90'}%</div>
+                  <div className="stat-label">Success</div>
+                </motion.div>
+                <motion.div className="stat-item rating" variants={fadeInUp}>
+                  <div className="rating-stars">
+                    {renderStars(lawyer.rating)}
+                    <span>{lawyer.rating}</span>
+                  </div>
+                  <div className="stat-label">{lawyer.reviewCount || '50'} Reviews</div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.button 
+                className="chat-button" 
+                onClick={handleChatClick}
+                variants={fadeInUp}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {lawyer.online ? (
-                  <>
-                    <i className="bi bi-chat-text-fill"></i> Chat Now
-                  </>
-                ) : lawyer.allowOfflineMessages ? (
-                  <>
-                    <i className="bi bi-envelope-fill"></i> Leave a Message
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-clock-fill"></i> Offline
-                  </>
-                )}
-              </button>
+                <i className="fas fa-comment-alt"></i> Chat Now
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
       
-      <div className="profile-content">
-        <div className="profile-tabs">
-          <button 
-            className={`tab-button ${activeTab === 'about' ? 'active' : ''}`}
-            onClick={() => setActiveTab('about')}
-          >
-            <i className="bi bi-info-circle"></i> About
-          </button>
-          <button 
-            className={`tab-button ${activeTab === 'experience' ? 'active' : ''}`}
-            onClick={() => setActiveTab('experience')}
-          >
-            <i className="bi bi-briefcase"></i> Experience
-          </button>
-          <button 
-            className={`tab-button ${activeTab === 'education' ? 'active' : ''}`}
-            onClick={() => setActiveTab('education')}
-          >
-            <i className="bi bi-mortarboard"></i> Education
-          </button>
-          <button 
-            className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reviews')}
-          >
-            <i className="bi bi-star"></i> Reviews
-          </button>
-        </div>
-        
-        <div className="profile-tab-content">
-          {activeTab === 'about' && (
-            <div className="about-tab">
-              <h3>About {lawyer.name}</h3>
-              <p className="lawyer-bio">{lawyer.bio}</p>
-              
-              <div className="info-section">
-                <h4><i className="bi bi-geo-alt-fill"></i> Location</h4>
-                <p>{lawyer.location}</p>
-              </div>
-              
-              <div className="info-section">
-                <h4><i className="bi bi-translate"></i> Languages</h4>
-                <div className="language-list">
-                  {lawyer.languages.map((lang, index) => (
-                    <span key={index} className="language-tag">
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="info-section">
-                <h4><i className="bi bi-briefcase"></i> Specialization</h4>
-                <p>{lawyer.specialization}</p>
-                {lawyer.subSpecialties && (
-                  <div className="subspecialties">
-                    <h5>Sub-specialties:</h5>
-                    <ul>
-                      {lawyer.subSpecialties.map((specialty, index) => (
-                        <li key={index}>{specialty}</li>
+      <div className="profile-container">
+        <motion.div 
+          className="profile-content"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="profile-tabs" variants={fadeInUp}>
+            <button 
+              className={`tab-button ${activeTab === 'about' ? 'active' : ''}`}
+              onClick={() => setActiveTab('about')}
+            >
+              <i className="fas fa-user"></i> About
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'experience' ? 'active' : ''}`}
+              onClick={() => setActiveTab('experience')}
+            >
+              <i className="fas fa-briefcase"></i> Experience
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'education' ? 'active' : ''}`}
+              onClick={() => setActiveTab('education')}
+            >
+              <i className="fas fa-graduation-cap"></i> Education
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}
+              onClick={() => setActiveTab('reviews')}
+            >
+              <i className="fas fa-star"></i> Reviews
+            </button>
+          </motion.div>
+          
+          <motion.div className="profile-tab-content" variants={fadeInUp}>
+            {activeTab === 'about' && (
+              <motion.div 
+                className="about-section"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div className="profile-section" variants={fadeInUp}>
+                  <h3>Bio</h3>
+                  <p>{lawyer.bio}</p>
+                </motion.div>
+                
+                <motion.div className="profile-section" variants={fadeInUp}>
+                  <h3>Contact Information</h3>
+                  <div className="lawyer-info-grid">
+                    <div className="info-item">
+                      <i className="fas fa-phone"></i>
+                      <div>
+                        <strong>Phone</strong>
+                        <p>{lawyer.phone || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-envelope"></i>
+                      <div>
+                        <strong>Email</strong>
+                        <p>{lawyer.email || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-map-marker-alt"></i>
+                      <div>
+                        <strong>Location</strong>
+                        <p>{lawyer.location || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-language"></i>
+                      <div>
+                        <strong>Languages</strong>
+                        <p>{lawyer.languages ? lawyer.languages.join(', ') : 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-rupee-sign"></i>
+                      <div>
+                        <strong>Consultation Fees</strong>
+                        <p>{lawyer.feesRange || 'Not provided'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+                
+                {lawyer.achievements && lawyer.achievements.length > 0 && (
+                  <motion.div className="profile-section" variants={fadeInUp}>
+                    <h3>Achievements</h3>
+                    <ul className="achievements-list">
+                      {lawyer.achievements.map((achievement, index) => (
+                        <li key={index}>
+                          <i className="fas fa-trophy"></i>
+                          <span>{achievement}</span>
+                        </li>
                       ))}
                     </ul>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+            
+            {activeTab === 'experience' && (
+              <motion.div 
+                className="experience-section"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {lawyer.experience_details && lawyer.experience_details.length > 0 ? (
+                  <div className="timeline">
+                    {lawyer.experience_details.map((exp, index) => (
+                      <motion.div 
+                        className="timeline-item" 
+                        key={index}
+                        variants={fadeInUp}
+                      >
+                        <div className="timeline-marker"></div>
+                        <div className="timeline-content">
+                          <h3>{exp.position}</h3>
+                          <div className="timeline-details">
+                            <span>
+                              <i className="fas fa-building"></i> {exp.firm}
+                            </span>
+                            <span>
+                              <i className="fas fa-calendar-alt"></i> {exp.period}
+                            </span>
+                          </div>
+                          <p>{exp.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data">
+                    <i className="fas fa-info-circle"></i>
+                    <p>No detailed experience information available.</p>
                   </div>
                 )}
-              </div>
-            </div>
-          )}
-          
-          {activeTab === 'experience' && (
-            <div className="experience-tab">
-              <h3>Professional Experience</h3>
-              
-              {lawyer.experience ? (
-                <div className="experience-years">
-                  <i className="bi bi-briefcase-fill"></i>
-                  <span>{lawyer.experience} years of experience</span>
-                </div>
-              ) : null}
-              
-              {lawyer.workHistory ? (
-                <div className="work-history">
-                  {lawyer.workHistory.map((work, index) => (
-                    <div key={index} className="work-item">
-                      <div className="work-period">{work.period}</div>
-                      <div className="work-role">{work.role}</div>
-                      <div className="work-company">{work.company}</div>
-                      <div className="work-description">{work.description}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="no-data-message">No detailed work history available</p>
-              )}
-            </div>
-          )}
-          
-          {activeTab === 'education' && (
-            <div className="education-tab">
-              <h3>Education & Qualifications</h3>
-              
-              {lawyer.education ? (
-                <div className="education-history">
-                  {lawyer.education.map((edu, index) => (
-                    <div key={index} className="education-item">
-                      <div className="education-period">{edu.period}</div>
-                      <div className="education-degree">{edu.degree}</div>
-                      <div className="education-institution">{edu.institution}</div>
-                      <div className="education-description">{edu.description}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="no-data-message">No detailed education information available</p>
-              )}
-              
-              {lawyer.certifications && lawyer.certifications.length > 0 && (
-                <div className="certifications">
-                  <h4>Certifications & Licenses</h4>
-                  <ul className="certification-list">
-                    {lawyer.certifications.map((cert, index) => (
-                      <li key={index} className="certification-item">
-                        <div className="certification-name">{cert.name}</div>
-                        <div className="certification-issuer">{cert.issuer}</div>
-                        <div className="certification-year">Issued: {cert.year}</div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {activeTab === 'reviews' && (
-            <div className="reviews-tab">
-              <h3>Client Reviews</h3>
-              
-              <div className="reviews-summary">
-                <div className="overall-rating">
-                  <div className="rating-number">{lawyer.rating.toFixed(1)}</div>
-                  <div className="rating-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <i 
-                        key={i} 
-                        className={`bi ${i < Math.floor(lawyer.rating) ? 'bi-star-fill' : i < lawyer.rating ? 'bi-star-half' : 'bi-star'}`}
-                      ></i>
+              </motion.div>
+            )}
+            
+            {activeTab === 'education' && (
+              <motion.div 
+                className="education-section"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {lawyer.education && lawyer.education.length > 0 ? (
+                  <div className="timeline">
+                    {lawyer.education.map((edu, index) => (
+                      <motion.div 
+                        className="timeline-item" 
+                        key={index}
+                        variants={fadeInUp}
+                      >
+                        <div className="timeline-marker"></div>
+                        <div className="timeline-content">
+                          <h3>{edu.degree}</h3>
+                          <div className="timeline-details">
+                            <span>
+                              <i className="fas fa-university"></i> {edu.institution}
+                            </span>
+                            <span>
+                              <i className="fas fa-calendar-alt"></i> {edu.year}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
-                  <div className="rating-count">Based on {lawyer.reviewCount} reviews</div>
-                </div>
-              </div>
-              
-              {lawyer.reviews ? (
-                <div className="reviews-list">
-                  {lawyer.reviews.map((review, index) => (
-                    <div key={index} className="review-item">
-                      <div className="review-header">
-                        <div className="reviewer-name">{review.name}</div>
-                        <div className="review-date">{review.date}</div>
-                      </div>
-                      <div className="review-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <i 
-                            key={i} 
-                            className={`bi ${i < review.rating ? 'bi-star-fill' : 'bi-star'}`}
-                          ></i>
-                        ))}
-                      </div>
-                      <div className="review-content">{review.comment}</div>
+                ) : (
+                  <div className="no-data">
+                    <i className="fas fa-info-circle"></i>
+                    <p>No detailed education information available.</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+            
+            {activeTab === 'reviews' && (
+              <motion.div 
+                className="reviews-section"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div className="reviews-summary" variants={fadeInUp}>
+                  <div className="rating-overview">
+                    <div className="rating-big">
+                      <span>{lawyer.rating}</span>
+                      <div className="big-stars">{renderStars(lawyer.rating)}</div>
+                      <p>{lawyer.reviewCount || mockReviews.length} reviews</p>
                     </div>
+                  </div>
+                </motion.div>
+                
+                <motion.div className="reviews-list" variants={staggerContainer}>
+                  {(lawyer.reviews || mockReviews).map((review, index) => (
+                    <motion.div 
+                      className="review-item" 
+                      key={review.id || index}
+                      variants={fadeInUp}
+                    >
+                      <div className="review-header">
+                        <div className="reviewer-info">
+                          {review.avatar ? (
+                            <img src={review.avatar} alt={review.name} />
+                          ) : (
+                            <div className="avatar-placeholder small">
+                              {review.name.charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <h4>{review.name}</h4>
+                            <span className="review-date">
+                              {formatDistanceToNow(new Date(review.date), { addSuffix: true })}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="review-rating">
+                          {renderStars(review.rating)}
+                        </div>
+                      </div>
+                      <p className="review-comment">{review.comment}</p>
+                    </motion.div>
                   ))}
-                </div>
-              ) : (
-                <p className="no-data-message">No reviews available yet</p>
-              )}
-            </div>
-          )}
-        </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
       </div>
     </motion.div>
   );
 };
-
-// Mock data for development and fallback
-const mockLawyers = [
-  {
-    id: 1,
-    name: 'Adv. Rajesh Sharma',
-    specialization: 'Criminal Law',
-    experience: 12,
-    rating: 4.8,
-    reviewCount: 124,
-    online: true,
-    location: 'Mumbai, Maharashtra',
-    languages: ['English', 'Hindi', 'Marathi'],
-    profilePicture: 'https://randomuser.me/api/portraits/men/42.jpg',
-    bio: 'Specializing in criminal defense with over 12 years of experience. I have successfully defended clients in high-profile cases including white-collar crimes, assault charges, and fraud allegations. My approach focuses on thorough case preparation and strategic defense planning that has resulted in numerous acquittals and favorable plea agreements for my clients.',
-    verified: true,
-    allowOfflineMessages: true,
-    badges: [
-      { name: 'Top Rated', icon: 'bi-award-fill', color: '#FFD700' },
-      { name: 'Quick Responder', icon: 'bi-lightning-fill', color: '#4361EE' }
-    ],
-    subSpecialties: ['White Collar Crime', 'Assault Defense', 'Fraud Cases'],
-    workHistory: [
-      {
-        period: '2015 - Present',
-        role: 'Senior Partner',
-        company: 'Sharma & Associates',
-        description: 'Leading a team of criminal defense attorneys handling major cases across Maharashtra.'
-      },
-      {
-        period: '2010 - 2015',
-        role: 'Associate Lawyer',
-        company: 'Mehta Law Firm',
-        description: 'Specialized in criminal defense with focus on financial crimes and fraud cases.'
-      }
-    ],
-    education: [
-      {
-        period: '2005 - 2010',
-        degree: 'LLB',
-        institution: 'Government Law College, Mumbai',
-        description: 'Graduated with honors, specializing in Criminal Law'
-      }
-    ],
-    certifications: [
-      {
-        name: 'Bar Council of Maharashtra and Goa',
-        issuer: 'Bar Council of India',
-        year: '2010'
-      }
-    ],
-    reviews: [
-      {
-        name: 'Amit Desai',
-        date: 'March 15, 2023',
-        rating: 5,
-        comment: 'Adv. Sharma handled my case with exceptional professionalism. His knowledge of criminal law and court procedures is impressive. Highly recommended!'
-      },
-      {
-        name: 'Priya Malhotra',
-        date: 'January 23, 2023',
-        rating: 4,
-        comment: 'Very thorough and dedicated lawyer. Took time to explain every detail of my case and achieved a favorable outcome.'
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Adv. Priya Patel',
-    specialization: 'Family Law',
-    experience: 8,
-    rating: 4.9,
-    reviewCount: 87,
-    online: true,
-    location: 'Delhi, NCR',
-    languages: ['English', 'Hindi', 'Punjabi'],
-    profilePicture: 'https://randomuser.me/api/portraits/women/26.jpg',
-    bio: 'I am a family law specialist focused on divorce, child custody, and domestic violence cases. My approach is compassionate yet effective, ensuring the best outcome for my clients while minimizing emotional trauma. I believe in finding amicable solutions where possible but am prepared to vigorously advocate in court when necessary.',
-    verified: true,
-    allowOfflineMessages: true,
-    badges: [
-      { name: 'Top Rated', icon: 'bi-award-fill', color: '#FFD700' }
-    ],
-    subSpecialties: ['Divorce', 'Child Custody', 'Domestic Violence Protection'],
-    workHistory: [
-      {
-        period: '2018 - Present',
-        role: 'Founding Partner',
-        company: 'Patel Family Law Practice',
-        description: 'Established and leading a specialized family law practice serving clients across Delhi NCR.'
-      },
-      {
-        period: '2015 - 2018',
-        role: 'Senior Associate',
-        company: 'Singh & Partners',
-        description: 'Handled complex family law cases including high-asset divorces and international custody disputes.'
-      }
-    ],
-    education: [
-      {
-        period: '2012 - 2015',
-        degree: 'LLB',
-        institution: 'Faculty of Law, Delhi University',
-        description: 'Graduated with distinction, specializing in Family Law'
-      }
-    ],
-    reviews: [
-      {
-        name: 'Neha Singh',
-        date: 'April 2, 2023',
-        rating: 5,
-        comment: 'Ms. Patel handled my divorce with extraordinary sensitivity and professionalism. She was always available to address my concerns and guided me through a difficult time with compassion.'
-      },
-      {
-        name: 'Rahul Khanna',
-        date: 'February 10, 2023',
-        rating: 5,
-        comment: "Adv. Patel's expertise in child custody matters was invaluable. She prioritized my children's well-being throughout the case and helped secure a favorable arrangement."
-      }
-    ]
-  }
-];
 
 export default LawyerProfilePage; 
