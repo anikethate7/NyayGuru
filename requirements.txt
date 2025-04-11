@@ -9,6 +9,7 @@ httpx>=0.25.0
 python-multipart>=0.0.6
 requests>=2.31.0
 
+
 # LangChain and AI dependencies
 langchain>=0.0.267
 langchain-community>=0.0.10
@@ -25,6 +26,9 @@ python-magic>=0.4.24
 sqlalchemy>=2.0.0
 redis>=4.5.1
 alembic>=1.11.1
+aiofiles>=23.1.0
+aiosqlite>=0.17.0
+databases>=0.7.0
 
 # Security and authentication
 passlib>=1.7.4

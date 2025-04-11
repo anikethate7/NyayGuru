@@ -2,7 +2,7 @@ import sqlite3
 import os
 
 # Get the database path from environment or use the default
-database_path = os.getenv("DATABASE_PATH", "app.db")
+database_path = os.getenv("DATABASE_PATH", "new_app.db")
 
 print(f"Updating database: {database_path}")
 
