@@ -36,7 +36,7 @@ const ForgotPasswordPage = () => {
       <div className="auth-form-wrapper">
         <div className="auth-header">
           <i className="bi bi-scale"></i>
-          <h1>LawGPT</h1>
+          <h1>JusticeJunction</h1>
         </div>
 
         <h2>Reset Your Password</h2>

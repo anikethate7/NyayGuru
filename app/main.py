@@ -90,7 +90,7 @@ async def serve_react_app(full_path: str):
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to NyayGuru API"}
+    return {"message": "Welcome to JusticeJunction API"}
 
 if __name__ == "__main__":
     import uvicorn

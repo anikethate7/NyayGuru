@@ -213,7 +213,7 @@ const AppLayout = () => {
       {!isAuthPage && !isChatPage && !isDocumentPage && (
         <footer className="app-footer">
           <div className="footer-content">
-            <p>&copy; {new Date().getFullYear()} NyayGuru - Legal AI Assistant. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} JusticeJunction - Legal AI Assistant. All rights reserved.</p>
           </div>
         </footer>
       )}

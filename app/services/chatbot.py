@@ -337,6 +337,8 @@ def make_response_conversational(response, query, message_type, llm):
             - Break up very long paragraphs but don't change the style dramatically
             - Ensure it flows naturally as part of a conversation
             - Do not add disclaimers or unnecessary statements
+            - Do not start with phrases like "Here's a rewritten version of the response:" or "Here's the information:"
+            - Do not preface your answer with any introduction - just provide the conversational response directly
             """
             
             try:

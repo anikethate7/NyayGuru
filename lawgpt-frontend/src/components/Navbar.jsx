@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import '../styles/Navbar.css';
 
 const Navbar = () => {
   const { currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -21,6 +23,7 @@ const Navbar = () => {
           top: section.offsetTop - 80, // Adjust for navbar height
           behavior: 'smooth'
         });
+        setActiveSection(sectionId);
       }
     }
     setIsMenuOpen(false);
@@ -36,6 +39,7 @@ const Navbar = () => {
             top: section.offsetTop - 80,
             behavior: 'smooth'
           });
+          setActiveSection(location.state.scrollTo);
         }
       }, 100); // Small delay to ensure DOM is ready
     }
@@ -43,17 +47,30 @@ const Navbar = () => {
   
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+      setScrolled(window.scrollY > 50);
+      
+      // Determine active section based on scroll position
+      const heroSection = document.getElementById('hero');
+      const servicesSection = document.getElementById('features');
+      const categoriesSection = document.getElementById('categories');
+      const benefitsSection = document.getElementById('benefits');
+      
+      const scrollPosition = window.scrollY + 100; // Add offset for better detection
+      
+      if (heroSection && scrollPosition < heroSection.offsetTop + heroSection.offsetHeight) {
+        setActiveSection('hero');
+      } else if (servicesSection && scrollPosition < servicesSection.offsetTop + servicesSection.offsetHeight) {
+        setActiveSection('features');
+      } else if (categoriesSection && scrollPosition < categoriesSection.offsetTop + categoriesSection.offsetHeight) {
+        setActiveSection('categories');
+      } else if (benefitsSection) {
+        setActiveSection('benefits');
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [scrolled]);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -87,9 +104,17 @@ const Navbar = () => {
     tap: { scale: 0.95 }
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActiveSection = (sectionId) => {
+    return activeSection === sectionId;
+  };
+
   return (
     <motion.nav 
-      className={`app-navbar ${scrolled ? 'scrolled' : ''}`}
+      className={`app-navbar ${scrolled ? 'scrolled' : ''} ${location.pathname === '/' ? 'homepage-nav' : ''}`}
       initial="hidden"
       animate="visible"
       variants={navVariants}
@@ -100,17 +125,46 @@ const Navbar = () => {
           whileTap={{ scale: 0.97 }}
         >
           <Link to="/" className="navbar-brand">
-            <i className="bi bi-briefcase-fill"></i>
-            <div>
-              <h1>Nyay<span style={{ fontWeight: 400 }}>Guru</span></h1>
-              <p className="tagline">Your AI Legal Assistant</p>
+            <div className="logo-container">
+              <svg className="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#4361EE" />
+                    <stop offset="100%" stopColor="#3A0CA3" />
+                  </linearGradient>
+                </defs>
+                <rect width="100" height="100" rx="20" fill="white"/>
+                <g fill="none" stroke="url(#gradient)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                  {/* Scale of Justice */}
+                  <line x1="50" y1="20" x2="50" y2="80" />
+                  <circle cx="50" cy="20" r="6" fill="url(#gradient)"/>
+                  <circle cx="50" cy="80" r="6" fill="url(#gradient)"/>
+                  
+                  {/* Left Scale */}
+                  <line x1="50" y1="35" x2="25" y2="50" />
+                  <circle cx="25" cy="50" r="4" fill="url(#gradient)"/>
+                  
+                  {/* Right Scale */}
+                  <line x1="50" y1="35" x2="75" y2="50" />
+                  <circle cx="75" cy="50" r="4" fill="url(#gradient)"/>
+                  
+                  {/* Book */}
+                  <rect x="35" y="58" width="30" height="15" rx="2" fill="url(#gradient)" fillOpacity="0.2"/>
+                  <line x1="40" y1="64" x2="60" y2="64" />
+                  <line x1="40" y1="68" x2="60" y2="68" />
+                </g>
+              </svg>
+            </div>
+            <div className="brand-text">
+              <h1><span className="brand-justice">Justice</span><span className="brand-junction">Junction</span></h1>
+              <p className="tagline">AI-Powered Legal Assistant</p>
             </div>
           </Link>
         </motion.div>
         
         <motion.div 
           className="mobile-toggle" 
-          onClick={() => setIsMenuOpen(!isMenuOpen)} 
+          onClick={toggleMenu} 
           aria-label="Toggle menu"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -124,14 +178,18 @@ const Navbar = () => {
             whileTap="tap"
             variants={linkVariants}
           >
-            <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+            <Link 
+              to="/" 
+              className={`nav-link ${location.pathname === '/' && isActiveSection('hero') ? 'active' : ''}`}
+              onClick={() => scrollToSection('hero')}
+            >
               <i className="bi bi-house-fill"></i> Home
             </Link>
           </motion.div>
           
           <motion.button 
-            onClick={() => scrollToSection('services-section')} 
-            className={`nav-link-btn`}
+            onClick={() => scrollToSection('features')} 
+            className={`nav-link-btn ${isActiveSection('features') ? 'active' : ''}`}
             whileHover="hover"
             whileTap="tap"
             variants={buttonVariants}
@@ -140,8 +198,8 @@ const Navbar = () => {
           </motion.button>
           
           <motion.button 
-            onClick={() => scrollToSection('categories-section')} 
-            className={`nav-link-btn`}
+            onClick={() => scrollToSection('categories')} 
+            className={`nav-link-btn ${isActiveSection('categories') ? 'active' : ''}`}
             whileHover="hover"
             whileTap="tap"
             variants={buttonVariants}
@@ -150,8 +208,8 @@ const Navbar = () => {
           </motion.button>
           
           <motion.button 
-            onClick={() => scrollToSection('benefits-section')} 
-            className={`nav-link-btn`}
+            onClick={() => scrollToSection('benefits')} 
+            className={`nav-link-btn ${isActiveSection('benefits') ? 'active' : ''}`}
             whileHover="hover"
             whileTap="tap"
             variants={buttonVariants}

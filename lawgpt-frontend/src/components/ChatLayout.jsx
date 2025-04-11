@@ -1,105 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import '../styles/ChatLayout.css';
 
 // Import the modern chat interface
 import ModernChatInterface from './ModernChatInterface';
 
 const ChatLayout = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { category: urlCategory } = useParams();
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('query');
   
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || 'General');
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
   
-  // Dummy data for chat history
-  const [chatHistory, setChatHistory] = useState([
-    { id: 1, title: 'Property Law Questions', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) },
-    { id: 2, title: 'Criminal Procedure Help', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) },
-    { id: 3, title: 'Tax Filing Assistance', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48) },
-  ]);
-  
-  // Function to start a new chat
-  const startNewChat = () => {
-    // In a real implementation, this would create a new chat session
-    console.log('Starting new chat');
-    navigate('/chat');
-  };
-  
-  // Format date for chat history
-  const formatDate = (date) => {
-    const now = new Date();
-    const diff = now - date;
-    
-    // Today
-    if (diff < 24 * 60 * 60 * 1000) {
-      return 'Today';
-    }
-    
-    // Yesterday
-    if (diff < 48 * 60 * 60 * 1000) {
-      return 'Yesterday';
-    }
-    
-    // Format the date
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-    });
-  };
-  
-  // Toggle sidebar collapse
+  // Toggle sidebar
   const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
+    setIsSidebarOpen(!isSidebarOpen);
   };
+  
+  // Handle category change
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+    setSelectedCategory(newCategory);
+  };
+  
+  // Handle language change
+  const handleLanguageChange = (e) => {
+    const newLanguage = e.target.value;
+    setSelectedLanguage(newLanguage);
+  };
+  
+  useEffect(() => {
+    // Close sidebar on smaller screens when clicking outside
+    const handleClickOutside = (event) => {
+      const sidebar = document.querySelector('.sidebar');
+      const toggleButton = document.querySelector('.sidebar-toggle');
+      
+      if (sidebar && !sidebar.contains(event.target) && 
+          toggleButton && !toggleButton.contains(event.target)) {
+        setIsSidebarOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="chat-layout">
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+      {/* Minimal Sidebar */}
+      <aside className={`sidebar minimal ${isSidebarOpen ? 'open' : 'collapsed'}`}>
         <div className="sidebar-header">
-          <div className="logo">
-            <i className="bi bi-scale"></i>
-            <h1>NyayGURU</h1>
-          </div>
-          <button className="collapse-btn" onClick={toggleSidebar}>
-            <i className={`bi ${sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'}`}></i>
+          <h3>Settings</h3>
+          <button 
+            className="sidebar-collapse-btn" 
+            onClick={toggleSidebar}
+            aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <i className={`bi ${isSidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
           </button>
         </div>
         
         <div className="sidebar-content">
-          {/* New Chat Button */}
-          <button className="new-chat-btn" onClick={startNewChat}>
-            <i className="bi bi-plus-lg"></i>
-            <span>New Chat</span>
-          </button>
+          {/* Category Selection */}
+          <div className="sidebar-section">
+            <h4>Category</h4>
+            <select 
+              className="select-control"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+            >
+              <option value="General">General</option>
+              <option value="Criminal Law">Criminal Law</option>
+              <option value="Civil Law">Civil Law</option>
+              <option value="Family Law">Family Law</option>
+              <option value="Corporate Law">Corporate Law</option>
+              <option value="Property Law">Property Law</option>
+            </select>
+          </div>
           
-          {/* Chat History */}
-          <div className="chat-history">
-            <h2 className="section-title">Recent Chats</h2>
-            <ul className="chat-list">
-              {chatHistory.map((chat) => (
-                <li key={chat.id} className="chat-item">
-                  <a href="#" className="chat-link">
-                    <i className="bi bi-chat-left-text"></i>
-                    <div className="chat-info">
-                      <span className="chat-title">{chat.title}</span>
-                      <span className="chat-date">{formatDate(chat.timestamp)}</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
+          {/* Language Selection */}
+          <div className="sidebar-section">
+            <h4>Language</h4>
+            <select 
+              className="select-control"
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+            >
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Marathi">Marathi</option>
+              <option value="Gujarati">Gujarati</option>
+              <option value="Bengali">Bengali</option>
+              <option value="Tamil">Tamil</option>
+            </select>
           </div>
         </div>
       </aside>
       
       {/* Main Chat Area */}
-      <main className="chat-main">
-        <ModernChatInterface initialQuery={searchQuery} initialCategory={urlCategory} />
+      <main className={`chat-main ${isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
+        <ModernChatInterface 
+          initialQuery={searchQuery} 
+          initialCategory={selectedCategory}
+          initialLanguage={selectedLanguage}
+          sidebarOpen={isSidebarOpen}
+        />
       </main>
     </div>
   );

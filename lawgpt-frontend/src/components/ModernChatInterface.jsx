@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { v4 as uuidv4 } from 'uuid';
 
-const ModernChatInterface = ({ initialQuery, initialCategory }) => {
+const ModernChatInterface = ({ initialQuery, initialCategory, initialLanguage, sidebarOpen }) => {
   const [messages, setMessages] = useState([
-    { id: 1, text: "Hello! I'm NyayGuru, your legal assistant. How can I help you today?", sender: 'bot', timestamp: new Date() },
+    { id: 1, text: "Hello! I'm JusticeJunction, your legal assistant. How can I help you today?", sender: 'bot', timestamp: new Date() },
   ]);
   const [inputText, setInputText] = useState(initialQuery || '');
   const [isTyping, setIsTyping] = useState(false);
@@ -15,13 +15,15 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
   const [category, setCategory] = useState(initialCategory || 'General');
   const [categories, setCategories] = useState([]);
   const [languages, setLanguages] = useState({});
-  const [currentLanguage, setCurrentLanguage] = useState('English');
+  const [currentLanguage, setCurrentLanguage] = useState(initialLanguage || 'English');
   const [error, setError] = useState(null);
   const [initialQueryProcessed, setInitialQueryProcessed] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -131,9 +133,31 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
     }
   }, [inputText]);
 
-  // Scroll to bottom of chat
+  // Handle scroll to show/hide scroll button
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = messagesContainerRef.current;
+      if (container) {
+        // Show button when scrolled more than 300px from bottom
+        const isScrollable = container.scrollHeight > container.clientHeight;
+        const isScrolledUp = container.scrollHeight - container.scrollTop - container.clientHeight > 300;
+        setShowScrollButton(isScrollable && isScrolledUp);
+      }
+    };
+
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  // Enhanced scrollToBottom function
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
   };
 
   useEffect(() => {
@@ -436,9 +460,22 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
     ]);
   };
 
+  // Update state when props change
+  useEffect(() => {
+    if (initialCategory && initialCategory !== category) {
+      setCategory(initialCategory);
+    }
+  }, [initialCategory]);
+  
+  useEffect(() => {
+    if (initialLanguage && initialLanguage !== currentLanguage) {
+      setCurrentLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
+
   return (
-    <div className={`modern-chat-interface ${isDarkMode ? 'dark-mode' : ''}`}>
-      {/* Chat Header */}
+    <div className={`modern-chat-interface ${isDarkMode ? 'dark-mode' : ''} ${sidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Chat Header - Simplified */}
       <div className="modern-chat-header">
         <div className="modern-chat-title">
           <i className="bi bi-chat-dots-fill"></i>
@@ -446,34 +483,6 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
         </div>
         
         <div className="modern-header-controls">
-          <div className="modern-category-selector">
-            <select 
-              className="modern-category-select form-select"
-              value={category}
-              onChange={handleCategoryChange}
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="modern-language-selector">
-            <select 
-              className="modern-language-select form-select"
-              value={currentLanguage}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-            >
-              {Object.keys(languages).length > 0 ? (
-                Object.keys(languages).map(lang => (
-                  <option key={lang} value={lang}>{lang}</option>
-                ))
-              ) : (
-                <option value="English">English</option>
-              )}
-            </select>
-          </div>
-          
           <button 
             className="modern-mode-toggle" 
             onClick={toggleDarkMode}
@@ -500,7 +509,7 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
       )}
       
       {/* Messages Container */}
-      <div className="modern-messages-container">
+      <div className="modern-messages-container" ref={messagesContainerRef}>
         {messages.map(message => (
           <div 
             key={message.id} 
@@ -556,6 +565,17 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
         <div ref={messagesEndRef}></div>
       </div>
       
+      {/* Scroll to bottom button */}
+      {showScrollButton && (
+        <button 
+          className="scroll-bottom-btn visible" 
+          onClick={scrollToBottom}
+          aria-label="Scroll to bottom"
+        >
+          <i className="bi bi-arrow-down"></i>
+        </button>
+      )}
+      
       {/* Input Area */}
       <div className="modern-input-area">
         <div className={`modern-input-container ${isFocused ? 'focused' : ''} ${isRecording ? 'recording' : ''}`}>
@@ -608,9 +628,6 @@ const ModernChatInterface = ({ initialQuery, initialCategory }) => {
             <i className="bi bi-send-fill"></i>
           </button>
         </div>
-        <p className="input-help-text">
-          Press Enter to send, Shift+Enter for a new line
-        </p>
       </div>
     </div>
   );

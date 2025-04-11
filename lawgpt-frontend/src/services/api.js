@@ -1,8 +1,9 @@
 import axios from "axios";
 import { adminUsers } from "../data/admins";
 
-// Change the API URL to point directly to the backend server
-const API_URL = "http://localhost:8000/api";
+// Use the environment variable for API URL with a fallback
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+console.log("Using API URL:", API_URL);
 
 // Create axios instance with default config
 const axiosInstance = axios.create({
@@ -10,7 +11,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // Add a 10 second timeout for all requests
+  timeout: 30000, // Increase to 30 seconds for all requests
 });
 
 // Add a request interceptor to add auth token to all requests

@@ -24,7 +24,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([
     {
       id: "welcome",
-      text: "Hello! I'm NyayGuru, your legal assistant. Select a legal category and ask me a question.",
+      text: "Hello! I'm JusticeJunction, your legal assistant. Select a legal category and ask me a question.",
       sender: "bot",
       sources: [],
       timestamp: new Date().toISOString(),
@@ -130,7 +130,7 @@ const ChatPage = () => {
       ...prev,
       {
         id: Date.now().toString(),
-        text: `You are now in the "${category}" category. Please ask a relevant question.`,
+        text: `Welcome to the ${currentCategory || "JusticeJunction"} chat. How can I assist you today?`,
         sender: "bot",
         sources: [],
         timestamp: new Date().toISOString(),
@@ -300,7 +300,7 @@ const ChatPage = () => {
     setMessages([
       {
         id: "welcome",
-        text: `Welcome to the ${currentCategory || "NyayGuru"} chat. How can I assist you today?`,
+        text: `Welcome to the ${currentCategory || "JusticeJunction"} chat. How can I assist you today?`,
         sender: "bot",
         sources: [],
         timestamp: new Date().toISOString(),
